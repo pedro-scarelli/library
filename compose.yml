@@ -43,9 +43,9 @@ services:
       ports:
         - "8000:80"
       command: httpd -f -h /var/www/
-  postgres:
+  database:
     image: postgres:16
-    container_name: postgres_db
+    container_name: database 
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -63,6 +63,7 @@ services:
     ports:
       - "8888:8888"
     environment:
+      DB_HOST: database
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
       SPRING_RABBITMQ_USERNAME: admin
