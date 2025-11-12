@@ -1,0 +1,39 @@
+{
+  "users": [
+    {
+      "name": "admin",
+      "password": "admin",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [
+    { "name": "/" }
+  ],
+  "permissions": [
+    {
+      "user": "admin",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "exchanges": [
+    {"name": "library_exchange1", "vhost": "/", "type": "direct", "durable": true}
+  ],
+  "queues": [
+    {"name": "library_catalog1", "vhost": "/", "durable": true},
+    {"name": "library_loan", "vhost": "/", "durable": true},
+    {"name": "library_user", "vhost": "/", "durable": true},
+    {"name": "dead_letter", "vhost": "/", "durable": true}
+  ],
+  "bindings": [
+    {
+      "source": "library",
+      "vhost": "/",
+      "destination": "",
+      "destination_type": "queue",
+      "routing_key": ""
+    },
+  ]
+}
