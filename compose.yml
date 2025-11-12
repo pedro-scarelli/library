@@ -1,48 +1,64 @@
 services:
   rabbitmq:
-    container_name: rabbitmq
-    image: rabbitmq:management
-    ports:
-      - 5672:5672
-      - 15672:15672
-    volumes:
-      - ./definitions.json:/etc/rabbitmq/definitions.json:ro
-      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
-      - rabbitmq_data:/var/lib/rabbitmq
-    environment:
-      RABBITMQ_DEFAULT_USER: admin
-      RABBITMQ_DEFAULT_PASS: admin
-    healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 10s
-      timeout: 30s
-      retries: 3
-    networks:
-      - backend
-    krakend_ce:
-        image: devopsfaith/krakend:watch
-        volumes:
-          - ./config/krakend:/etc/krakend
-        ports:
-          - "1234:1234"
-          - "8080:8080"
-          - "8090:8090"
-        command: ["run", "-d", "-c", "/etc/krakend/krakend.json"]
-        depends_on:
-          - fake_api
-          - jaeger
-    postgres:
-      image: postgres:16
-      container_name: postgres_db
-      environment:
-        POSTGRES_USER: admin
-        POSTGRES_PASSWORD: secure_password
-        POSTGRES_DB: myapp
+      container_name: rabbitmq
+      image: rabbitmq:management
       ports:
-        - "5432:5432"
+        - 5672:5672
+        - 15672:15672
       volumes:
-        - postgres_data:/var/lib/postgresql/data
-      restart: unless-stopped
+        - ./definitions.json:/etc/rabbitmq/definitions.json:ro
+        - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+        - rabbitmq_data:/var/lib/rabbitmq
+      environment:
+        RABBITMQ_DEFAULT_USER: admin
+        RABBITMQ_DEFAULT_PASS: admin
+      healthcheck:
+        test: rabbitmq-diagnostics -q ping
+        interval: 10s
+        timeout: 30s
+        retries: 3
+      networks:
+        - backend
+  krakend_ce:
+      image: devopsfaith/krakend:watch
+      volumes:
+        - ./config/krakend:/etc/krakend
+      ports:
+        - "1234:1234"
+        - "8080:8080"
+        - "8090:8090"
+      command: ["run", "-d", "-c", "/etc/krakend/krakend.json"]
+      depends_on:
+        - fake_api
+        - jaeger
+  jaeger:
+    image: jaegertracing/all-in-one:1
+    ports:
+      - "16686:16686"
+      - "14268:14268"
+  fake_api:
+      image: busybox:latest
+      volumes:
+        - ./data:/var/www/
+      ports:
+        - "8000:80"
+      command: httpd -f -h /var/www/
+  postgres:
+    image: postgres:16
+    container_name: postgres_db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
+  rabbitmq_data:
   postgres_data:
+
+networks:
+  backend:
+    driver: bridge
