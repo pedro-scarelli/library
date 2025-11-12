@@ -61,7 +61,7 @@ services:
     image: docker-user:latest
     container_name: user
     ports:
-      - "8080:8080"
+      - "8888:8888"
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_RABBITMQ_PORT: 5672
