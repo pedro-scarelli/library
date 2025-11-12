@@ -29,11 +29,25 @@
   ],
   "bindings": [
     {
-      "source": "library",
+      "source": "library_exchange1",
       "vhost": "/",
-      "destination": "",
+      "destination": "library_catalog1",
       "destination_type": "queue",
-      "routing_key": ""
+      "routing_key": "catalog"
     },
+    {
+      "source": "library_exchange1",
+      "vhost": "/",
+      "destination": "library_loan",
+      "destination_type": "queue",
+      "routing_key": "loan"
+    },
+    {
+      "source": "library_exchange1",
+      "vhost": "/",
+      "destination": "library_user",
+      "destination_type": "queue",
+      "routing_key": "user"
+    }
   ]
 }
