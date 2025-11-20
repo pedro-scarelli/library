@@ -19,8 +19,9 @@ services:
         retries: 3
       networks:
         - backend
+
   krakend_ce:
-      image: devopsfaith/krakend:watch
+      image: krakend:latest
       volumes:
         - ./config/krakend:/etc/krakend
       ports:
@@ -28,21 +29,9 @@ services:
         - "8080:8080"
         - "8090:8090"
       command: ["run", "-d", "-c", "/etc/krakend/krakend.json"]
-      depends_on:
-        - fake_api
-        - jaeger
-  jaeger:
-    image: jaegertracing/all-in-one:1
-    ports:
-      - "16686:16686"
-      - "14268:14268"
-  fake_api:
-      image: busybox:latest
-      volumes:
-        - ./data:/var/www/
-      ports:
-        - "8000:80"
-      command: httpd -f -h /var/www/
+      networks:
+        - backend
+
   database:
     image: postgres:16
     environment:
@@ -55,12 +44,13 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - backend
+
   user:
     build:
       context: ./user
       dockerfile: Dockerfile
     ports:
-      - "8888:8888"
+      - "8888:8080"
     environment:
       - DB_HOST=database
       - DB_PORT=5432
