@@ -5,7 +5,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import com.login.user.domain.dto.response.ViaCepResponseDTO;
 import com.login.user.domain.mapper.UserMapper;
+import com.login.user.domain.model.Address;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +36,8 @@ public class UserService implements UserDetailsService {
     private final EmailService emailService;
 
     private final UserMapper userMapper;
+
+    private final ViaCepService viaCepService;
 
     public UserPaginationResponseDTO getAllUsers(int page, int items) {
         var users = userRepository.findAll(PageRequest.of(page - 1, items));
@@ -76,6 +80,15 @@ public class UserService implements UserDetailsService {
         newUser.setEnabled(false);
 
         isUserCredentialsDuplicated(newUser.getEmail());
+
+        if (createUserRequestDto.cep() != null && !createUserRequestDto.cep().isBlank()) {
+            Address address = createAddressFromCep(
+                    createUserRequestDto.cep(),
+                    createUserRequestDto.numero()
+            );
+            address.setUser(newUser);
+            newUser.setAddress(address);
+        }
 
         var hashedPassword = new BCryptPasswordEncoder().encode(newUser.getPassword());
         newUser.setPassword(hashedPassword);
@@ -137,5 +150,27 @@ public class UserService implements UserDetailsService {
         var passwordEncoder = new BCryptPasswordEncoder();
 
         return passwordEncoder.encode(password);
+    }
+
+    private Address createAddressFromCep(String cep, String numero) {
+        ViaCepResponseDTO viaCepResponse = viaCepService.buscarCep(cep);
+
+        Address address = new Address();
+        String cepLimpo = viaCepResponse.getCep().replaceAll("[^0-9]", "");
+
+        // LOGS TEMPORÁRIOS
+        System.out.println("CEP original: " + viaCepResponse.getCep());
+        System.out.println("CEP limpo: " + cepLimpo);
+        System.out.println("Tamanho do CEP: " + cepLimpo.length());
+
+        address.setCep(cepLimpo);
+        address.setLogradouro(viaCepResponse.getLogradouro());
+        address.setComplemento(viaCepResponse.getComplemento());
+        address.setBairro(viaCepResponse.getBairro());
+        address.setLocalidade(viaCepResponse.getLocalidade());
+        address.setUf(viaCepResponse.getUf());
+        address.setNumero(numero);
+
+        return address;
     }
 }

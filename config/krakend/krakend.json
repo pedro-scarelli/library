@@ -52,12 +52,20 @@
           ],
           "url_pattern":"/v1/user"
         }
+      ],
+      "input_headers": [
+        "Authorization"
+      ],
+      "input_query_strings": [
+        "page",
+        "items"
       ]
     },
     {
       "endpoint":"/v1/user",
       "method":"POST",
       "output_encoding":"no-op",
+      "timeout": "10s",
       "backend":[
         {
           "host":[
@@ -104,6 +112,9 @@
           ],
           "url_pattern":"/v1/user/{id}"
         }
+      ],
+      "input_headers": [
+        "Authorization"
       ]
     },
     {

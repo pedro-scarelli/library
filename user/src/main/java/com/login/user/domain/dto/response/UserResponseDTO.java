@@ -12,5 +12,6 @@ public record UserResponseDTO(
         boolean isEnabled,
         UserRole role,
         Instant createdAt,
-        Instant deletedAt
+        Instant deletedAt,
+        AddressResponseDTO address
     ) { }

@@ -33,14 +33,14 @@ public class User implements UserDetails {
 
     @Column (name="st_name", nullable = false)
     private String name;
- 
+
     @Column (name="st_email", nullable = false)
     private String email;
 
     @Column (name="st_hashed_password", nullable = false)
     private String password;
 
-    @Enumerated(EnumType.ORDINAL) 
+    @Enumerated(EnumType.ORDINAL)
     @Column (name="it_role", nullable = false)
     private UserRole role;
 
@@ -59,6 +59,10 @@ public class User implements UserDetails {
 
     @Column (name="dt_otp_timestamp")
     private Instant otpTimestamp;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "fk_address_id", referencedColumnName = "pk_id")
+    private Address address;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -90,4 +94,3 @@ public class User implements UserDetails {
         return true;
     }
 }
-

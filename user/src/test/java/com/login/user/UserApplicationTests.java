@@ -49,7 +49,7 @@ class UserServiceTest {
 
     @Test
     void registerDuplicatedUserCredentialsShouldThrowDuplicatedCredentialsException() {
-        var createUserDto = new CreateUserRequestDTO("John Doe", "john@example.com", "password");
+        var createUserDto = new CreateUserRequestDTO("John Doe", "john@example.com", "password", "12345678", "123");
         when(userRepository.existsByEmail("john@example.com")).thenReturn(true);
 
         assertThrows(DuplicateCredentialsException.class, () -> userService.createUser(createUserDto));
