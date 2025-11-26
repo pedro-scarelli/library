@@ -19,31 +19,31 @@
     }
   ],
   "exchanges": [
-    {"name": "library_exchange1", "vhost": "/", "type": "direct", "durable": true}
+    {"name": "library_exchange", "vhost": "/", "type": "direct", "durable": true}
   ],
   "queues": [
-    {"name": "library_catalog1", "vhost": "/", "durable": true},
+    {"name": "library_catalog", "vhost": "/", "durable": true},
     {"name": "library_loan", "vhost": "/", "durable": true},
     {"name": "library_user", "vhost": "/", "durable": true},
     {"name": "dead_letter", "vhost": "/", "durable": true}
   ],
   "bindings": [
     {
-      "source": "library_exchange1",
+      "source": "library_exchange",
       "vhost": "/",
-      "destination": "library_catalog1",
+      "destination": "library_catalog",
       "destination_type": "queue",
       "routing_key": "catalog"
     },
     {
-      "source": "library_exchange1",
+      "source": "library_exchange",
       "vhost": "/",
       "destination": "library_loan",
       "destination_type": "queue",
       "routing_key": "loan"
     },
     {
-      "source": "library_exchange1",
+      "source": "library_exchange",
       "vhost": "/",
       "destination": "library_user",
       "destination_type": "queue",
