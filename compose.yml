@@ -1,0 +1,116 @@
+services:
+  rabbitmq:
+      container_name: rabbitmq
+      image: rabbitmq:management
+      ports:
+        - 5672:5672
+        - 15672:15672
+      volumes:
+        - ./definitions.json:/etc/rabbitmq/definitions.json:ro
+        - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+        - rabbitmq_data:/var/lib/rabbitmq
+      environment:
+        RABBITMQ_DEFAULT_USER: admin
+        RABBITMQ_DEFAULT_PASS: admin
+      healthcheck:
+        test: rabbitmq-diagnostics -q ping
+        interval: 10s
+        timeout: 30s
+        retries: 3
+      networks:
+        - backend
+
+  krakend_ce:
+      image: krakend:latest
+      volumes:
+        - ./config/krakend:/etc/krakend
+      ports:
+        - "1234:1234"
+        - "8080:8080"
+        - "8090:8090"
+      command: ["run", "-d", "-c", "/etc/krakend/krakend.json"]
+      networks:
+        - backend
+
+  database:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  user:
+    build:
+      context: ./user
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=admin
+      - SPRING_RABBITMQ_PASSWORD=admin
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - backend
+
+  loan:
+    build:
+      context: ./loan
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=admin
+      - SPRING_RABBITMQ_PASSWORD=admin
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - backend
+
+  catalog:
+    build:
+      context: ./catalog
+      dockerfile: Dockerfile
+    environment:
+      - DB_HOST=database
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=admin
+      - SPRING_RABBITMQ_PASSWORD=admin
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - backend
+volumes:
+  rabbitmq_data:
+  postgres_data:
+
+networks:
+  backend:
+    driver: bridge
