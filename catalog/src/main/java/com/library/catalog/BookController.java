@@ -37,4 +37,15 @@ public class BookController {
         return ResponseEntity.ok(booksResponse);
     }
 
+    @GetMapping("/search/author")
+    public ResponseEntity<Page<BookResponseDTO>> searchBooksByAuthor(
+            @RequestParam String author,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int items
+    ) {
+        var books = bookService.searchBooksByAuthor(author, page, items);
+        var booksResponse = books.map(bookMapper::toDto);
+        return ResponseEntity.ok(booksResponse);
+    }
+
 }

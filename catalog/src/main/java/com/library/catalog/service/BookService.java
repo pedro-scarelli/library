@@ -24,4 +24,8 @@ public class BookService {
     public Page<Book> searchBooksByTitle(String title, int page, int items) {
         return bookRepository.findByTitleContaining(title, PageRequest.of(page - 1, items));
     }
+
+    public Page<Book> searchBooksByAuthor(String author, int page, int items) {
+        return bookRepository.findByAuthorContaining(author, PageRequest.of(page - 1, items));
+    }
 }
