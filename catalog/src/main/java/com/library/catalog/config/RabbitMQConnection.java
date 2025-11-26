@@ -5,7 +5,9 @@ import com.rabbitmq.client.ConnectionFactory;
 
 public class RabbitMQConnection {
     public static final String EXCHANGE = "library_exchange";
+
     public interface Queues {
+        String ELECTION = "library_election";
         String CATALOG = "library_catalog";
     }
 
