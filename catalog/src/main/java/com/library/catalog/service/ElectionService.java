@@ -27,7 +27,7 @@ public class ElectionService {
         return id;
     }
 
-    public boolean isCoordinatior() {
+    public boolean isCoordinator() {
         return COORDINATOR.get();
     }
 

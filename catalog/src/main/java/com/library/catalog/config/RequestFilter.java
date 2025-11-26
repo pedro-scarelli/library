@@ -23,7 +23,7 @@ public class RequestFilter extends OncePerRequestFilter {
         @NonNull HttpServletResponse response,
         @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        if (electionService.isCoordinatior()) {
+        if (electionService.isCoordinator()) {
             filterChain.doFilter(request, response);
         }
     }
