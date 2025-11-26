@@ -6,12 +6,10 @@ import com.library.catalog.domain.mapper.BookMapper;
 import com.library.catalog.service.BookService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RequestMapping(path = "/v1/book", produces = "application/json")
@@ -26,6 +24,17 @@ public class BookController {
     public ResponseEntity<BookResponseDTO> createBook(@Valid @RequestBody CreateBookRequestDTO createBookRequestDTO) {
         var book = bookService.createBook(createBookRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(bookMapper.toDto(book));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<BookResponseDTO>> searchBooks(
+            @RequestParam String title,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int items
+    ) {
+        var books = bookService.searchBooksByTitle(title, page, items);
+        var booksResponse = books.map(bookMapper::toDto);
+        return ResponseEntity.ok(booksResponse);
     }
 
 }
