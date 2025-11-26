@@ -157,12 +157,6 @@ public class UserService implements UserDetailsService {
 
         Address address = new Address();
         String cepLimpo = viaCepResponse.getCep().replaceAll("[^0-9]", "");
-
-        // LOGS TEMPORÁRIOS
-        System.out.println("CEP original: " + viaCepResponse.getCep());
-        System.out.println("CEP limpo: " + cepLimpo);
-        System.out.println("Tamanho do CEP: " + cepLimpo.length());
-
         address.setCep(cepLimpo);
         address.setLogradouro(viaCepResponse.getLogradouro());
         address.setComplemento(viaCepResponse.getComplemento());
